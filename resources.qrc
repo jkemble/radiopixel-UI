@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/ui">
+        <file>wheel.png</file>
+        <file>hat.png</file>
+    </qresource>
+</RCC>
