@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     //Step( duration(secs), brightness(0-255), speed(%), level1, pattern, color1, color2, color3 )
     Step idle( 0, 20, 35, 17, 7, Qt::red, Qt::white, Qt::green );
     {
-        Macro m( "Warn", Qt::yellow );
+        Sequence m( "Warn", Qt::yellow );
         m.AddStep( Step(  4, FULL, 100, 255, 4, Qt::yellow, Qt::yellow, Qt::yellow ) );
         m.AddStep( Step( 60, FULL,  40,  34, 5, Qt::yellow, Qt::yellow, Qt::yellow ) );
         m.AddStep( Step( 60, FULL, 100,  75, 0, Qt::yellow, QColor( 255, 255, 64 ), Qt::yellow ) );
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
         m_macros.push_back( m );
     }
     {
-        Macro m( "Exit", Qt::red );
+        Sequence m( "Exit", Qt::red );
         m.AddStep( Step(  4, FULL, 100, 255, 4, Qt::red, Qt::red, Qt::red ) );
         m.AddStep( Step( 60, FULL,  40,  34, 5, Qt::red, Qt::red, Qt::red ) );
         m.AddStep( Step( 60, FULL, 100,  75, 0, Qt::red, QColor( 255, 64, 64 ), Qt::red ) );
@@ -43,82 +43,82 @@ MainWindow::MainWindow(QWidget *parent)
         m_macros.push_back( m );
     }
     {
-        Macro m( "Idle", Qt::white );
+        Sequence m( "Idle", Qt::white );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
 
     {
-        Macro m( "RWR\nSubtle" );
+        Sequence m( "RWR\nSubtle" );
         m.AddStep( Step( 30, FULL, 35, 17, 7, Qt::red, Qt::white, Qt::red ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
     {
-        Macro m( "Blue\nSmooth");
+        Sequence m( "Blue\nSmooth");
         m.AddStep( Step( 30, FULL,  75,  75, 7, Qt::blue, QColor( 128, 128, 255 ), Qt::blue ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
     {
-        Macro m( "RWB\nParis USA");
+        Sequence m( "RWB\nParis USA");
         m.AddStep( Step( 10, FULL, 160, 160, 0, Qt::red, Qt::white, Qt::blue ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
 
     {
-        Macro m( "RWG\nCandy");
+        Sequence m( "RWG\nCandy");
         m.AddStep( Step( 30, FULL/2, 65, 255, 10, Qt::red, Qt::white, Qt::green ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }    
     {
-        Macro m( "RWR\nCandy");
+        Sequence m( "RWR\nCandy");
         m.AddStep( Step( 30, FULL/2, 100, 255, 10, Qt::red, Qt::white, Qt::red ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
     {
-        Macro m( "RWG\nTree");
+        Sequence m( "RWG\nTree");
         m.AddStep( Step( 10, FULL, 100, 255, 8, Qt::red, Qt::white, Qt::green ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
 
     {
-        Macro m( "RWG\nMarch");
+        Sequence m( "RWG\nMarch");
         m.AddStep( Step( 30, FULL, 127, 8, 5, Qt::red, Qt::white, Qt::green ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
     {
-        Macro m( "RWG\nWipe");
+        Sequence m( "RWG\nWipe");
         m.AddStep( Step( 30, FULL, 127, 8, 6, Qt::red, Qt::white, Qt::green ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
     {
-        Macro m( "RWG\nFlicker");
+        Sequence m( "RWG\nFlicker");
         m.AddStep( Step( 10, FULL, 255, 9, 1, Qt::red, Qt::white, Qt::green ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
 
     {
-        Macro m( "CGA");
+        Sequence m( "CGA");
         m.AddStep( Step( 30, FULL, 100, 128, 0, Qt::cyan, Qt::magenta, Qt::yellow ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
     {
-        Macro m( "Rainbow");
+        Sequence m( "Rainbow");
         m.AddStep( Step( 10, FULL, 100, 255, 3, Qt::white, Qt::white, Qt::white ) );
         m.AddStep( idle );
         m_macros.push_back( m );
     }
     {
-        Macro m( "Strobe");
+        Sequence m( "Strobe");
         m.AddStep( Step( 10, FULL, 128, 255, 9, Qt::white, Qt::white, Qt::white ) );
         m.AddStep( idle );
         m_macros.push_back( m );
@@ -506,7 +506,7 @@ void MainWindow::ExecMacroStep( int _macro, int _step )
         return;
     }
     m_macro = _macro;
-    Macro& macro( m_macros[ m_macro ] );
+    Sequence& macro( m_macros[ m_macro ] );
     if ( _step >= macro.steps.size( ) )
     {
         return;

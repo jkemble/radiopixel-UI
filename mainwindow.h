@@ -38,10 +38,10 @@ struct Step
 typedef std::vector< Step > Steps;
 
 
-class Macro
+class Sequence
 {
 public:
-    Macro( QString _name, QColor _color = QColor( ) )
+    Sequence( QString _name, QColor _color = QColor( ) )
         : name( _name ), color( _color )
     {
     }
@@ -56,7 +56,7 @@ public:
     Steps steps;
 };
 
-typedef std::vector< Macro > Macros;
+typedef std::vector< Sequence > Macros;
 
 class Num : public QLabel
 {
