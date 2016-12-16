@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-//#define SERIAL
 #ifdef SERIAL
 #include <vector>
 #include <QSerialPort>
@@ -31,7 +30,7 @@ struct Step
     {
     }
 
-    HatPacket pattern;
+    RadioPixel::Command pattern;
     int duration;
 };
 
@@ -99,7 +98,7 @@ protected slots:
 
 protected:
     void ExecMacroStep( int macro, int step );
-    void SendPacket( const HatPacket& packet );
+    void SendPacket( const RadioPixel::Command& packet );
     void Log( const QString& str );
 
     // serial ports
@@ -122,7 +121,7 @@ protected:
     QTextEdit *m_recv;
 
     // Transmit handling
-    HatPacket m_pending;
+    RadioPixel::Command m_pending;
     QTimer m_xmitTimer;
     time_t m_xmitLast;
 

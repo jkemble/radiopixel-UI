@@ -6,10 +6,10 @@
 
 QT       += core gui bluetooth
 
-macx {
-QT       += serialport
-DEFINES  += SERIAL
-}
+//macx {
+//QT       += serialport
+//DEFINES  += SERIAL
+//}
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

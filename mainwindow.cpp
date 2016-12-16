@@ -338,7 +338,7 @@ void MainWindow::discover( )
         QString str( "S%1");
         m_ports->addItem( info.portName(), str.arg( i ));
     }
-    int i = m_ports->findText( "usbserial-DJ", Qt::MatchContains );
+    int i = m_ports->findText( "usbserial-", Qt::MatchContains );
     if ( i != -1 )
     {
         ChangePort( i );
@@ -399,13 +399,28 @@ void MainWindow::servicesDone()
 
     connect( m_btService, SIGNAL(stateChanged(QLowEnergyService::ServiceState)),
              this, SLOT(serviceStateChanged(QLowEnergyService::ServiceState)));
-    Log("BT detail discovery starting\n");
-    m_btService->discoverDetails();
+    serviceStateChanged( m_btService->state());
+    if ( m_btService->state() == QLowEnergyService::DiscoveryRequired )
+    {
+        Log("BT detail discovery starting\n");
+        m_btService->discoverDetails();
+    }
 }
 
 void MainWindow::serviceStateChanged( QLowEnergyService::ServiceState s )
 {
-    Log(QString("BT service state %1\n").arg(s));
+    QString ss;
+    switch ( s )
+    {
+    case QLowEnergyService::InvalidService: ss = "InvalidService"; break;
+    case QLowEnergyService::DiscoveryRequired: ss = "DiscoveryRequired"; break;
+    case QLowEnergyService::DiscoveringServices: ss = "DiscoveringServices"; break;
+    case QLowEnergyService::ServiceDiscovered: ss = "ServiceDiscovered"; break;
+    case QLowEnergyService::LocalService: ss = "LocalService"; break;
+    default: ss = "(Unknown)"; break;
+    }
+
+    Log(QString("BT service state %1\n").arg(ss));
 }
 
 void MainWindow::ChangePort(int index)
@@ -449,7 +464,7 @@ void MainWindow::ChangePort(int index)
 
 void MainWindow::SendControl( )
 {
-    HatPacket packet;
+    RadioPixel::Command packet;
     packet.command = HC_CONTROL;
     packet.brightness = m_brightness->value();
     packet.speed = m_speed->value();
@@ -462,7 +477,7 @@ void MainWindow::SendPattern( )
     // stop any running macros
     m_macroTimer.stop();
 
-    HatPacket packet;
+    RadioPixel::Command packet;
     packet.command = HC_PATTERN;
     packet.pattern = m_pattern.checkedId( );
     packet.brightness = m_brightness->value();
@@ -535,7 +550,7 @@ void MainWindow::SendPending( )
     SendPacket( m_pending );
 }
 
-void MainWindow::SendPacket( const HatPacket& packet )
+void MainWindow::SendPacket( const RadioPixel::Command& packet )
 {
     // if we're being throttled then get out now
     if ( m_xmitTimer.isActive())
