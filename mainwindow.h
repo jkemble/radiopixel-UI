@@ -7,17 +7,21 @@
 #endif
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <QLowEnergyController>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QUdpSocket>
 #include <QPointer>
 #include <QTimer>
 #include <QWidget>
 #include <QLabel>
+#include <QPushButton>
 #include <QComboBox>
 #include <QTextEdit>
 #include <QSignalMapper>
 #include <QSlider>
 #include <QButtonGroup>
 #include "colorpicker.h"
-#include "radiopixel-protocol/radiopixel_protocol.h"
+#include "radiopixel_protocol.h"
 
 
 struct Step
@@ -74,6 +78,8 @@ public:
     ~MainWindow();
 
 public slots:
+    void toggleAdmin();
+    void setAdmin( bool admin );
     void discover();
     void deviceDiscovered( QBluetoothDeviceInfo info );
     void deviceDone();
@@ -100,6 +106,7 @@ protected:
     void ExecMacroStep( int macro, int step );
     void SendPacket( const RadioPixel::Command& packet );
     void Log( const QString& str );
+    bool isAdmin() const;
 
     // serial ports
 #ifdef SERIAL
@@ -113,8 +120,15 @@ protected:
     QPointer< QLowEnergyController > m_btController;
     QPointer< QLowEnergyService > m_btService;
 
+    // UDP LAN socket
+    QUdpSocket m_udpSocket;
+
+    // TCP cloud socket
+    QTcpSocket m_cloudSocket;
+
     // GUI
     QComboBox *m_ports;
+    QPushButton *m_refresh;
     ColorPicker *m_color1, *m_color2, *m_color3;
     QSlider *m_brightness, *m_speed, *m_level1, *m_level2, *m_level3;
     QButtonGroup m_pattern, m_macroGroup;

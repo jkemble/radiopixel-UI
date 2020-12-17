@@ -1,9 +1,9 @@
 #include <QGridLayout>
 #include <QTabWidget>
 #include <QLabel>
-#include <QPushButton>
 #include <QMessageBox>
 #include <QTextStream>
+#include <QShortcut>
 #include "mainwindow.h"
 #ifdef SERIAL
 #include <QSerialPortInfo>
@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
 {
     // setup macros
-    const int FULL = 128;
+    const int FULL = 255;
     //Step( duration(secs), brightness(0-255), speed(%), level1, pattern, color1, color2, color3 )
     Step idle( 0, 20, 35, 17, 7, Qt::red, Qt::white, Qt::green );
     {
@@ -176,10 +176,10 @@ MainWindow::MainWindow(QWidget *parent)
                  this, SLOT( ChangePort(int)));
         grid->addWidget( m_ports, r, 0, 1, 8 );
 
-        QPushButton *refresh = new QPushButton( "R" );
-        connect( refresh, SIGNAL(clicked(bool)),
+        m_refresh = new QPushButton( "R" );
+        connect( m_refresh, SIGNAL(clicked(bool)),
                  this, SLOT( discover()));
-        grid->addWidget( refresh, r, 8, 1, 1 );
+        grid->addWidget( m_refresh, r, 8, 1, 1 );
 
         r++;
 
@@ -318,12 +318,30 @@ MainWindow::MainWindow(QWidget *parent)
         this, SLOT( deviceDone( ) ) );
     discover();
 
+    // socket
+    m_udpSocket.connectToHost( QHostAddress::Broadcast, HN_PORT );
+
     connect( &m_xmitTimer, SIGNAL(timeout()), this, SLOT(SendPending()));
+    setAdmin( false );
+
+    QShortcut *admin = new QShortcut( Qt::CTRL + Qt::Key_B, this, SLOT(toggleAdmin()));
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+void MainWindow::toggleAdmin()
+{
+    setAdmin( !isAdmin());
+}
+
+void MainWindow::setAdmin( bool admin )
+{
+    m_ports->setVisible( admin );
+    m_refresh->setVisible( admin );
+    m_recv->setVisible( admin );
 }
 
 void MainWindow::discover( )
@@ -345,9 +363,11 @@ void MainWindow::discover( )
     }
 #endif
 
+    m_ports->addItem( "Cloud: hats.blynch.net", "Chats.blynch.net");
+
     m_btDevices.clear();
     Log("BT device discovery starting\n");
-    m_btAgent.start();
+    //m_btAgent.start();
 }
 
 void MainWindow::deviceDiscovered( QBluetoothDeviceInfo info )
@@ -443,6 +463,14 @@ void MainWindow::ChangePort(int index)
         m_btController->connectToDevice( );
         delete m_btService;
     }
+    else if ( type == 'C' )
+    {
+        if ( m_cloudSocket.state() != QTcpSocket::UnconnectedState)
+        {
+            m_cloudSocket.disconnectFromHost();
+        }
+        m_cloudSocket.connectToHost( str.mid( 1 ), 8100 );
+    }
     else if ( type == 'S' )
     {
 #ifdef SERIAL
@@ -505,6 +533,7 @@ void MainWindow::ReadSerial()
 
 void MainWindow::StartMacro( int macro )
 {
+    m_xmitTimer.stop();
     ExecMacroStep( macro, 0 );
 }
 
@@ -577,6 +606,8 @@ void MainWindow::SendPacket( const RadioPixel::Command& packet )
     data.append( ( char *)&packet, sizeof packet );
 
     // transmit
+
+    // bluetooth
     if ( m_btService )
     {
         QLowEnergyService::ServiceState state = m_btService->state();
@@ -597,6 +628,15 @@ void MainWindow::SendPacket( const RadioPixel::Command& packet )
         m_port.write( data );
 #endif
     }
+
+    // UDP socket broadcast
+    m_udpSocket.write( data );
+
+    // TCP socket transmit to cloud, if enabled
+    if ( m_cloudSocket.state() == QTcpSocket::ConnectedState )
+    {
+        m_cloudSocket.write( data );
+    }
 }
 
 void MainWindow::Log(const QString& str)
@@ -604,4 +644,9 @@ void MainWindow::Log(const QString& str)
     QTextCursor cursor( m_recv->document( ) );
     cursor.movePosition( QTextCursor::End );
     cursor.insertText( str);
+}
+
+bool MainWindow::isAdmin() const
+{
+    return m_ports->isVisible();
 }

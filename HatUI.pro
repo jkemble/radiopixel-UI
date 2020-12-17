@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui bluetooth
+QT       += core gui bluetooth network
 
 //macx {
 //QT       += serialport
@@ -16,11 +16,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = HatUI
 TEMPLATE = app
 
-INCLUDEPATH += /Users/blynch/Documents/Arduino/libraries
+PROTOCOL_DIR = $$PWD/../radiopixel-protocol
+
+INCLUDEPATH += $$PROTOCOL_DIR
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    /Users/blynch/Documents/Arduino/libraries/radiopixel-protocol/radiopixel_protocol.cpp \
+    $$PROTOCOL_DIR/radiopixel_protocol.cpp \
     colorpicker.cpp
 
 HEADERS  += mainwindow.h \
