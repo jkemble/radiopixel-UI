@@ -31,6 +31,8 @@ HEADERS  += mainwindow.h \
 RESOURCES += \
     resources.qrc
 
+RC_ICONS = hat.ico
+
 ICON = hat.icns
 
 DISTFILES += \
